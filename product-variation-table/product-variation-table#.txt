@@ -1,0 +1,224 @@
+<?php
+/**
+ * Plugin Name: Product Variation Table
+ * Description: Adds a shortcode to display a variation table for variable products.
+ * Version: 1.0
+ * Author: Joseph Saad
+ * License: GPL2
+ */
+
+
+
+function custom_variation_table_shortcode() {
+    global $product;
+
+    if ( ! is_product() || ! $product->is_type( 'variable' ) ) {
+        return '<p>This widget only works on variable products.</p>';
+    }
+
+    $variations = $product->get_available_variations();
+    ob_start();
+    ?>
+    <div class="variation-table-container" style="background: rgba(255,255,255,0.5); padding: 20px;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid gray;">
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Qty</th>
+                    <th>Add</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ( $variations as $variation ) :
+                    $variation_obj = wc_get_product( $variation['variation_id'] );
+
+                    if ( ! $variation_obj->is_in_stock() ) {
+                        continue;
+                    }
+
+                    $image = wp_get_attachment_image( $variation_obj->get_image_id(), 'thumbnail' );
+                    $name = $variation_obj->get_name();
+                    $stock = 'In Stock';
+                ?>
+                <tr style="border-bottom: 1px solid gray;">
+                    <td><?php echo $image; ?></td>
+                    <td><?php echo esc_html( $name ); ?></td>
+                    <td><?php echo esc_html( $stock ); ?></td>
+                    <td>
+                        <div class="qty-wrapper" style="display: flex; align-items: center;">
+                            <button class="qty-minus" style="padding: 5px 10px;">−</button>
+                            <input type="text" value="0" class="qty" style="width: 50px; text-align: center;" readonly />
+                            <button class="qty-plus" style="padding: 5px 10px;">+</button>
+                        </div>
+                    </td>
+                    <td>
+                        <button class="add-to-cart-button"
+                            data-product_id="<?php echo $variation_obj->get_id(); ?>"
+                            style="padding: 5px 10px;">Add</button>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <style>
+.variation-table-container {
+    background-color: #f3f3f3;
+    padding: 20px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    overflow-x: auto;
+}
+
+.variation-table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+.variation-table-container thead {
+    background-color: #ececec;
+}
+
+.variation-table-container th {
+    padding: 12px;
+    text-align: left;
+    font-weight: bold;
+    border-bottom: 1px solid gray;
+}
+
+.variation-table-container td {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+/* Bold Green In Stock Text */
+.variation-table-container td:nth-child(3) {
+    font-weight: bold;
+    color: #28a745;
+}
+
+/* Quantity buttons + - */
+.qty-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.qty-wrapper input.qty {
+    width: 50px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 6px;
+    background-color: #fff;
+}
+
+.qty-wrapper button {
+    padding: 8px 14px;
+    /*background-color: #0073aa;*/
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* Add to cart button */
+.add-to-cart-button {
+    padding: 10px 24px;
+    /*background-color: #0073aa;*/
+    color: white;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 16px;
+    min-width: 160px;
+}
+
+.add-to-cart-button::after {
+    content: ' to Cart';
+}
+
+/* Responsive for mobile */
+@media (max-width: 768px) {
+    .variation-table-container table {
+        display: block;
+    }
+
+    .variation-table-container thead {
+        display: none;
+    }
+
+    .variation-table-container tr {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #ccc;
+        padding: 10px;
+    }
+
+    .variation-table-container td {
+        display: flex;
+        justify-content: space-between;
+        padding: 6px 0;
+    }
+}
+</style>
+
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.qty-wrapper').forEach(wrapper => {
+            const minus = wrapper.querySelector('.qty-minus');
+            const plus = wrapper.querySelector('.qty-plus');
+            const input = wrapper.querySelector('.qty');
+
+            minus.addEventListener('click', e => {
+                e.stopPropagation();
+                let current = parseInt(input.value);
+                if (current > 0) {
+                    input.value = current - 1;
+                }
+            });
+
+            plus.addEventListener('click', e => {
+                e.stopPropagation();
+                let current = parseInt(input.value);
+                input.value = current + 1;
+            });
+        });
+
+        document.querySelectorAll('.add-to-cart-button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const qtyInput = btn.closest('tr').querySelector('.qty');
+                const qty = parseInt(qtyInput.value);
+                const productId = btn.getAttribute('data-product_id');
+
+                if (qty > 0) {
+                    jQuery.post('/?wc-ajax=add_to_cart', {
+                        product_id: productId,
+                        quantity: qty
+                    }, function(response) {
+                        if (response) {
+                            alert('Added to cart!');
+                            jQuery(document.body).trigger('added_to_cart', [response.fragments, response.cart_hash, btn]);
+                        }
+                    });
+                } else {
+                    alert('Please select a quantity.');
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+    return ob_get_clean();
+}
+add_shortcode('product_variation_table', 'custom_variation_table_shortcode');
