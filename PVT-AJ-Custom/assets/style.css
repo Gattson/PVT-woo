@@ -1,0 +1,108 @@
+.variation-table-container {
+    background-color: #f3f3f3;
+    padding: 20px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    overflow-x: auto;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.variation-table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    //min-width: 600px;
+}
+
+.variation-table-container thead {
+    background-color: #ececec;
+}
+
+.variation-table-container th {
+    padding: 12px;
+    text-align: left;
+    font-weight: bold;
+    border-bottom: 1px solid gray;
+}
+
+.variation-table-container td {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    vertical-align: middle;
+}
+
+.attribute-label {
+    font-weight: bold;
+}
+
+
+.qty-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.qty-wrapper input.qty {
+    width: 50px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 6px;
+    background-color: #fff;
+}
+
+.qty-wrapper button {
+    padding: 8px 14px;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    /* background-color: #0073aa; */
+}
+
+.add-to-cart-button {
+    padding: 10px 24px;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 16px;
+    min-width: 160px;
+    /* background-color: #0073aa; */
+}
+
+.add-to-cart-button::after {
+    content: ' to Cart';
+}
+
+@media (max-width: 768px) {
+    .variation-table-container table {
+        display: block;
+    }
+
+    .variation-table-container thead {
+        display: none;
+    }
+
+    .variation-table-container tr {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #ccc;
+        padding: 10px;
+    }
+
+    .variation-table-container td {
+        display: flex;
+        justify-content: flex-start;
+        gap: 6px;
+        flex-wrap: wrap;
+        padding: 6px 0;
+        overflow-wrap: anywhere;
+        word-break: normal;
+        white-space: normal;
+        max-width: 100%;
+        word-wrap: normal;
+    }
+}
