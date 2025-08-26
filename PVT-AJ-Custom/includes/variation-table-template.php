@@ -55,9 +55,14 @@
 				</td>
                 <?php if ( get_option('pvt_show_stock') ) : ?>
                     <td>
-                        <?php echo esc_html( $stock_status ); ?>
-                        <?php if ( $variation_obj->get_stock_quantity() !== null ) : ?>
-                            (<?php echo esc_html( $variation_obj->get_stock_quantity() ); ?> available)
+                        <?php if ( get_option('pvt_show_status') ) : ?>
+							<?php echo esc_html( $stock_status ); ?>
+							<?php if ( $variation_obj->get_stock_quantity() !== null ) : ?>
+								(<?php echo esc_html( $variation_obj->get_stock_quantity() ); ?> available)
+							<?php endif; ?>
+						
+                        <?php elseif ( $variation_obj->get_stock_quantity() !== null ) : ?>
+                            <?php echo esc_html( $variation_obj->get_stock_quantity() ); ?> available
                         <?php endif; ?>
                     </td>
                 <?php endif; ?>

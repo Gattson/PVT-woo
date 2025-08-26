@@ -45,7 +45,7 @@ function pvt_register_settings() {
     register_setting('pvt_settings_group', 'pvt_show_price');
     register_setting('pvt_settings_group', 'pvt_show_stock');
 	register_setting('pvt_settings_group', 'pvt_show_add_to_cart');
-
+	register_setting('pvt_settings_group', 'pvt_show_status');
 }
 add_action( 'admin_init', 'pvt_register_settings' );
 
@@ -81,7 +81,7 @@ function pvt_render_settings_page() {
             <label><input type="checkbox" name="pvt_show_price" value="1" <?php checked(1, get_option('pvt_show_price'), true); ?> /> Price </label><br>
             <label><input type="checkbox" name="pvt_show_stock" value="1" <?php checked(1, get_option('pvt_show_stock'), true); ?> /> Stock Status </label><br>
 			<label><input type="checkbox" name="pvt_show_add_to_cart" value="1" <?php checked(1, get_option('pvt_show_add_to_cart'), true); ?> /> Show “Add to Cart” Column </label><br>
-
+			<label><input type="checkbox" name="pvt_show_status" value="1" <?php checked(1, get_option('pvt_show_status'), true); ?> /> Show "In Stock" </label><br>
             <?php submit_button(); ?>
         </form>
     </div>
